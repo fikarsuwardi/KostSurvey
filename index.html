@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kostku</title>
+  <style>
+    :root {
+      --primary: #1565C0;
+      --primary-light: #1976D2;
+      --primary-bg: #E3F2FD;
+      --bg: #F0F4F8;
+      --surface: #FFFFFF;
+      --text: #1A1A2E;
+      --text-2: #555;
+      --text-3: #999;
+      --border: #E4E9F0;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: #D8E4F0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    #app {
+      max-width: 430px;
+      height: 100%;
+      margin: 0 auto;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ── Screens ────────────────────────────── */
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .header {
+      background: var(--surface);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .header-sub {
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .btn-icon:active {
+      background: var(--border);
+    }
+
+    /* ── Scroll area ─────────────────────────── */
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 88px;
+    }
+
+    /* ── FAB ─────────────────────────────────── */
+    .fab {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(21, 101, 192, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .15s;
+      z-index: 10;
+    }
+
+    .fab:active {
+      transform: scale(0.93);
+    }
+
+    /* ── Empty state ─────────────────────────── */
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 32px;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      opacity: .25;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      color: var(--text-3);
+      line-height: 1.6;
+    }
+
+    /* ── Search bar ──────────────────────────── */
+    .search-bar {
+      padding: 10px 14px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--text-3);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 38px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 0 14px 0 36px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    /* ── Kost Card ───────────────────────────── */
+    .card-list {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .kost-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .12s;
+    }
+
+    .kost-card:active {
+      transform: scale(0.985);
+    }
+
+    .card-photo {
+      width: 100%;
+      height: 150px;
+      background: #E8ECF0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: var(--text-3);
+      overflow: hidden;
+    }
+
+    .card-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 14px 14px 10px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .card-label {
+      font-size: 15px;
+      font-weight: 600;
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    .status-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      color: #fff;
+      white-space: nowrap;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+
+    .card-price {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .card-price small {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-3);
+    }
+
+    .card-loc {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      min-width: 80px;
+      height: 34px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .btn-action:active {
+      background: var(--bg);
+    }
+
+    .btn-action.maps {
+      background: var(--primary-bg);
+      color: var(--primary);
+      border-color: transparent;
+    }
+
+    /* ── Form ────────────────────────────────── */
+    .form-content {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-section {
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-3);
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      font-family: inherit;
+      transition: border-color .15s;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .form-textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .price-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .price-row .form-input {
+      flex: 1;
+    }
+
+    .price-row .form-select {
+      width: 108px;
+      flex-shrink: 0;
+    }
+
+    /* ── Status picker ───────────────────────── */
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .status-option {
+      padding: 10px 8px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      color: var(--text-2);
+      user-select: none;
+      line-height: 1.3;
+    }
+
+    .status-option.selected {
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* ── Location ────────────────────────────── */
+    .loc-display {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      font-size: 13px;
+      color: var(--text-3);
+      margin-bottom: 8px;
+      line-height: 1.4;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .loc-display.has-loc {
+      color: var(--text);
+      border-color: #4CAF50;
+    }
+
+    .btn-loc {
+      width: 100%;
+      height: 44px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity .15s;
+    }
+
+    .btn-loc:active {
+      opacity: .8;
+    }
+
+    .btn-loc:disabled {
+      opacity: .5;
+      cursor: default;
+    }
+
+    /* ── Photos ──────────────────────────────── */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .photo-thumb {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+      cursor: pointer;
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-photo {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      background: rgba(0, 0, 0, 0.55);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .photo-add {
+      aspect-ratio: 1;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-3);
+      font-size: 22px;
+    }
+
+    .photo-add span.label {
+      font-size: 10px;
+    }
+
+    .photo-add:active {
+      background: var(--border);
+    }
+
+    /* ── Facilities ──────────────────────────── */
+    .fac-group {
+      margin-bottom: 12px;
+    }
+
+    .fac-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .fac-group-title {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 7px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .fac-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .fac-item {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .12s;
+      font-size: 10px;
+      color: var(--text-2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      user-select: none;
+      line-height: 1.2;
+    }
+
+    .fac-item .fi {
+      font-size: 19px;
+    }
+
+    .fac-item.on {
+      background: var(--primary-bg);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* ── Save bar ────────────────────────────── */
+    .save-bar {
+      padding: 14px 16px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .btn-save {
+      width: 100%;
+      height: 50px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+
+    .btn-save:active {
+      opacity: .85;
+    }
+
+    .btn-save:disabled {
+      opacity: .5;
+      cursor: default;
+    }
+
+    /* ── Detail ──────────────────────────────── */
+    .detail-gallery {
+      position: relative;
+      background: #111;
+      height: 230px;
+      overflow: hidden;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .gallery-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-empty {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      color: #333;
+    }
+
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      background: rgba(0, 0, 0, 0.35);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gallery-nav.prev {
+      left: 10px;
+    }
+
+    .gallery-nav.next {
+      right: 10px;
+    }
+
+    .gallery-count {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .detail-body {
+      padding: 18px 16px;
+    }
+
+    .detail-label {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .detail-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .detail-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .d-icon {
+      font-size: 18px;
+      width: 26px;
+      text-align: center;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .d-label {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 2px;
+    }
+
+    .d-value {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .detail-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-3);
+      margin: 18px 0 10px;
+    }
+
+    .fac-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .fac-chip {
+      background: var(--primary-bg);
+      color: var(--primary);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .fac-chip.none {
+      background: var(--bg);
+      color: var(--text-3);
+    }
+
+    .detail-notes {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 13px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+
+    .btn-det {
+      flex: 1;
+      min-width: calc(50% - 4px);
+      height: 46px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-det:active {
+      opacity: .8;
+    }
+
+    .btn-det.call {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .btn-det.wa {
+      background: #E8F5E9;
+      color: #1B5E20;
+    }
+
+    .btn-det.maps {
+      background: var(--primary-bg);
+      color: var(--primary);
+    }
+
+    .btn-det.edit {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-det.delete {
+      background: #FFEBEE;
+      color: #C62828;
+      flex: unset;
+      width: 100%;
+    }
+
+    /* ── Photo viewer ────────────────────────── */
+    #photo-viewer {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #photo-viewer.open {
+      display: flex;
+    }
+
+    #viewer-img {
+      max-width: 100%;
+      max-height: 88vh;
+      object-fit: contain;
+    }
+
+    .v-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, .15);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .v-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, .15);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .v-nav.prev {
+      left: 10px;
+    }
+
+    .v-nav.next {
+      right: 10px;
+    }
+
+    .v-counter {
+      position: absolute;
+      bottom: 18px;
+      color: rgba(255, 255, 255, .7);
+      font-size: 13px;
+    }
+
+    /* ── Confirm dialog ──────────────────────── */
+    #confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 150;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    #confirm-overlay.open {
+      display: flex;
+    }
+
+    .confirm-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px 20px;
+      width: 100%;
+      max-width: 430px;
+      text-align: center;
+    }
+
+    .confirm-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .confirm-sub {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .confirm-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .confirm-btns button {
+      flex: 1;
+      height: 46px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-c-cancel {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .btn-c-confirm {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    /* ── Toast ───────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #323232;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      opacity: 0;
+      transition: all .28s;
+      z-index: 300;
+      white-space: nowrap;
+      max-width: 90vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Loading ─────────────────────────────── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 120px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+
+    <!-- ════════════════════ SCREEN: LIST ════════════════════ -->
+    <div id="screen-list" class="screen">
+      <div class="header">
+        <div class="header-title">🏠 KostSurvey</div>
+        <span id="kost-count" style="font-size:12px;color:var(--text-3)"></span>
+      </div>
+      <div class="search-bar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input id="search-input" class="search-input" type="text" placeholder="Cari nama, alamat, catatan...">
+        </div>
+      </div>
+      <div class="scroll-content" id="list-container">
+        <div class="loading">Memuat data...</div>
+      </div>
+      <button class="fab" id="btn-add">+</button>
+    </div>
+
+    <!-- ════════════════════ SCREEN: FORM ════════════════════ -->
+    <div id="screen-form" class="screen">
+      <div class="header">
+        <button class="btn-icon" id="form-back">←</button>
+        <div class="header-sub" id="form-title">Tambah Kosan</div>
+      </div>
+      <div class="scroll-content">
+        <div class="form-content">
+
+          <!-- Identitas -->
+          <div class="form-section">
+            <div class="section-title">Identitas</div>
+            <div class="form-group">
+              <label class="form-label">Nama / Label Kosan *</label>
+              <input id="f-label" class="form-input" type="text" placeholder="cth: Kos Bu Sari — Jl. Mawar No. 5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor Telepon Pemilik</label>
+              <input id="f-phone" class="form-input" type="tel" placeholder="cth: 08123456789">
+            </div>
+          </div>
+
+          <!-- Harga & Status -->
+          <div class="form-section">
+            <div class="section-title">Harga & Status</div>
+            <div class="form-group">
+              <label class="form-label">Harga Sewa</label>
+              <div class="price-row">
+                <input id="f-price" class="form-input" type="number" min="0" placeholder="800000">
+                <select id="f-price-type" class="form-select">
+                  <option value="bulan">/ Bulan</option>
+                  <option value="tahun">/ Tahun</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <div class="status-grid" id="status-grid">
+                <div class="status-option" data-val="dilihat">👀 Dilihat</div>
+                <div class="status-option" data-val="dihubungi">📞 Dihubungi</div>
+                <div class="status-option" data-val="survey">🚶 Survey</div>
+                <div class="status-option" data-val="dipertimbangkan">🤔 Dipertimbangkan</div>
+                <div class="status-option" data-val="dipilih">✅ Dipilih</div>
+                <div class="status-option" data-val="ditolak">❌ Ditolak</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lokasi -->
+          <div class="form-section">
+            <div class="section-title">Lokasi</div>
+            <div id="f-loc-display" class="loc-display">📍 Belum ada lokasi tersimpan</div>
+            <button class="btn-loc" id="btn-get-loc">📡 Ambil Lokasi Sekarang</button>
+          </div>
+
+          <!-- Foto -->
+          <div class="form-section">
+            <div class="section-title">Foto</div>
+            <div class="photo-grid" id="photo-grid"></div>
+            <input id="photo-input" type="file" accept="image/*" multiple style="display:none">
+          </div>
+
+          <!-- Fasilitas -->
+          <div class="form-section">
+            <div class="section-title">Fasilitas</div>
+            <div class="fac-group">
+              <div class="fac-group-title">Kamar</div>
+              <div class="fac-grid" id="fac-kamar"></div>
+            </div>
+            <div class="fac-group">
+              <div class="fac-group-title">Kamar Mandi</div>
+              <div class="fac-grid" id="fac-km"></div>
+            </div>
+            <div class="fac-group">
+              <div class="fac-group-title">Umum</div>
+              <div class="fac-grid" id="fac-umum"></div>
+            </div>
+          </div>
+
+          <!-- Catatan -->
+          <div class="form-section">
+            <div class="section-title">Catatan</div>
+            <textarea id="f-notes" class="form-textarea"
+              placeholder="Catatan bebas: kesan pertama, hasil negosiasi, kondisi lingkungan..."></textarea>
+          </div>
+
+        </div>
+      </div>
+      <div class="save-bar">
+        <button class="btn-save" id="btn-save">Simpan Kosan</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════ SCREEN: DETAIL ════════════════════ -->
+    <div id="screen-detail" class="screen">
+      <div class="header">
+        <button class="btn-icon" id="detail-back">←</button>
+        <div class="header-sub" id="detail-header-label"></div>
+        <button class="btn-icon" id="detail-edit-btn">✏️</button>
+      </div>
+      <div class="scroll-content">
+        <div id="detail-content"></div>
+      </div>
+    </div>
+
+  </div><!-- #app -->
+
+  <!-- ── Photo Viewer ───────────────────────── -->
+  <div id="photo-viewer">
+    <button class="v-close" id="viewer-close">✕</button>
+    <img id="viewer-img" src="" alt="">
+    <button class="v-nav prev" id="viewer-prev">‹</button>
+    <button class="v-nav next" id="viewer-next">›</button>
+    <div class="v-counter" id="viewer-counter"></div>
+  </div>
+
+  <!-- ── Confirm delete ─────────────────────── -->
+  <div id="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-title">Hapus Kosan?</div>
+      <div class="confirm-sub">Semua data termasuk foto dan catatan akan dihapus permanen.</div>
+      <div class="confirm-btns">
+        <button class="btn-c-cancel" id="confirm-cancel">Batal</button>
+        <button class="btn-c-confirm" id="confirm-delete">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ──────────────────────────────── -->
+  <div id="toast"></div>
+
+  <script>
+    'use strict';
+
+    // ══════════════════════════════════════════════════════════
+    // IndexedDB
+    // ══════════════════════════════════════════════════════════
+    const DB_NAME = 'kostku_db', DB_VER = 1, STORE = 'kosts';
+    let _db;
+
+    function openDB() {
+      return new Promise((res, rej) => {
+        const req = indexedDB.open(DB_NAME, DB_VER);
+        req.onupgradeneeded = e => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE))
+            db.createObjectStore(STORE, { keyPath: 'id' });
+        };
+        req.onsuccess = e => { _db = e.target.result; res(); };
+        req.onerror = e => rej(e.target.error);
+      });
+    }
+
+    const _tx = m => _db.transaction(STORE, m).objectStore(STORE);
+    const dbAll = () => new Promise((r, j) => { const q = _tx('readonly').getAll(); q.onsuccess = () => r(q.result); q.onerror = j; });
+    const dbGet = id => new Promise((r, j) => { const q = _tx('readonly').get(id); q.onsuccess = () => r(q.result); q.onerror = j; });
+    const dbPut = o => new Promise((r, j) => { const q = _tx('readwrite').put(o); q.onsuccess = () => r(q.result); q.onerror = j; });
+    const dbDel = id => new Promise((r, j) => { const q = _tx('readwrite').delete(id); q.onsuccess = () => r(); q.onerror = j; });
+
+    // ══════════════════════════════════════════════════════════
+    // Helpers
+    // ══════════════════════════════════════════════════════════
+    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+    function formatRp(n) {
+      if (!n) return null;
+      return 'Rp\u00a0' + Number(n).toLocaleString('id-ID');
+    }
+
+    const STATUS = {
+      dilihat: { label: 'Dilihat', color: '#78909C' },
+      dihubungi: { label: 'Dihubungi', color: '#1976D2' },
+      survey: { label: 'Survey', color: '#F57C00' },
+      dipertimbangkan: { label: 'Dipertimbangkan', color: '#7B1FA2' },
+      dipilih: { label: 'Dipilih ✓', color: '#388E3C' },
+      ditolak: { label: 'Ditolak', color: '#C62828' },
+    };
+    const statusMeta = s => STATUS[s] || STATUS.dilihat;
+
+    function resizePhoto(file) {
+      return new Promise(res => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const MAX = 1200;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w >= h) { h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const cv = document.createElement('canvas');
+          cv.width = w; cv.height = h;
+          cv.getContext('2d').drawImage(img, 0, 0, w, h);
+          URL.revokeObjectURL(url);
+          res(cv.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = url;
+      });
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    let _toastTimer;
+    function toast(msg, dur = 2400) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => el.classList.remove('show'), dur);
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Facilities config
+    // ══════════════════════════════════════════════════════════
+    const FAC = {
+      kamar: [
+        { key: 'ac', label: 'AC', icon: '❄️' },
+        { key: 'kipas', label: 'Kipas', icon: '🌀' },
+        { key: 'kasur', label: 'Kasur', icon: '🛏️' },
+        { key: 'lemari', label: 'Lemari', icon: '🗄️' },
+        { key: 'meja', label: 'Meja', icon: '🪑' },
+        { key: 'jendela', label: 'Jendela', icon: '🪟' },
+      ],
+      km: [
+        { key: 'km_dalam', label: 'KM Dalam', icon: '🚿' },
+        { key: 'km_luar', label: 'KM Luar', icon: '🚽' },
+        { key: 'water_heater', label: 'Water Heater', icon: '🔥' },
+      ],
+      umum: [
+        { key: 'wifi', label: 'WiFi', icon: '📶' },
+        { key: 'listrik_token', label: 'Listrik Token', icon: '⚡' },
+        { key: 'parkir_motor', label: 'Parkir Motor', icon: '🛵' },
+        { key: 'parkir_mobil', label: 'Parkir Mobil', icon: '🚗' },
+        { key: 'dapur', label: 'Dapur', icon: '🍳' },
+        { key: 'laundry', label: 'Laundry', icon: '👕' },
+        { key: 'cctv', label: 'CCTV', icon: '📹' },
+        { key: 'gerbang24', label: 'Gerbang 24j', icon: '🔐' },
+      ],
+    };
+    const ALL_FAC = [...FAC.kamar, ...FAC.km, ...FAC.umum];
+
+    // ══════════════════════════════════════════════════════════
+    // App state
+    // ══════════════════════════════════════════════════════════
+    const S = {
+      screen: 'list',
+      editingId: null,
+      viewingId: null,
+      formPhotos: [],
+      formLocation: null,
+      formFacilities: {},
+      formStatus: 'dilihat',
+      viewerPhotos: [],
+      viewerIdx: 0,
+      pendingDeleteId: null,
+      searchQuery: '',
+    };
+
+    // ══════════════════════════════════════════════════════════
+    // Router
+    // ══════════════════════════════════════════════════════════
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+      S.screen = name;
+      // scroll to top
+      const sc = document.querySelector('#screen-' + name + ' .scroll-content');
+      if (sc) sc.scrollTop = 0;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Status picker
+    // ══════════════════════════════════════════════════════════
+    function setStatus(val) {
+      S.formStatus = val;
+      const meta = statusMeta(val);
+      document.getElementById('status-grid').querySelectorAll('.status-option').forEach(opt => {
+        const sel = opt.dataset.val === val;
+        opt.classList.toggle('selected', sel);
+        opt.style.background = sel ? meta.color : '';
+      });
+    }
+
+    document.getElementById('status-grid').querySelectorAll('.status-option').forEach(opt => {
+      opt.addEventListener('click', () => setStatus(opt.dataset.val));
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // Facility grid renderer
+    // ══════════════════════════════════════════════════════════
+    function renderFacGroup(containerId, items) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = items.map(f => `
+    <div class="fac-item ${S.formFacilities[f.key] ? 'on' : ''}" data-key="${f.key}">
+      <span class="fi">${f.icon}</span>${f.label}
+    </div>`).join('');
+      el.querySelectorAll('.fac-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const k = item.dataset.key;
+          S.formFacilities[k] = !S.formFacilities[k];
+          item.classList.toggle('on', S.formFacilities[k]);
+        });
+      });
+    }
+
+    function renderAllFac() {
+      renderFacGroup('fac-kamar', FAC.kamar);
+      renderFacGroup('fac-km', FAC.km);
+      renderFacGroup('fac-umum', FAC.umum);
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Photo grid (form)
+    // ══════════════════════════════════════════════════════════
+    const MAX_PHOTOS = 8;
+
+    function renderPhotoGrid() {
+      const grid = document.getElementById('photo-grid');
+      let html = S.formPhotos.map((src, i) => `
+    <div class="photo-thumb" data-i="${i}">
+      <img src="${src}" alt="" loading="lazy">
+      <button class="remove-photo" data-i="${i}">×</button>
+    </div>`).join('');
+      if (S.formPhotos.length < MAX_PHOTOS) {
+        html += `<div class="photo-add" id="btn-add-photo"><span>📷</span><span class="label">Tambah</span></div>`;
+      }
+      grid.innerHTML = html;
+
+      grid.querySelectorAll('.photo-thumb img').forEach((img, i) => {
+        img.addEventListener('click', () => openViewer(S.formPhotos, i));
+      });
+      grid.querySelectorAll('.remove-photo').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          S.formPhotos.splice(Number(btn.dataset.i), 1);
+          renderPhotoGrid();
+        });
+      });
+      const addBtn = document.getElementById('btn-add-photo');
+      if (addBtn) addBtn.addEventListener('click', () => document.getElementById('photo-input').click());
+    }
+
+    document.getElementById('photo-input').addEventListener('change', async e => {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+      const available = MAX_PHOTOS - S.formPhotos.length;
+      const batch = files.slice(0, available);
+      toast(`Memproses ${batch.length} foto...`);
+      const results = await Promise.all(batch.map(resizePhoto));
+      S.formPhotos.push(...results);
+      renderPhotoGrid();
+      e.target.value = '';
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // Geolocation
+    // ══════════════════════════════════════════════════════════
+    document.getElementById('btn-get-loc').addEventListener('click', () => {
+      const btn = document.getElementById('btn-get-loc');
+      const disp = document.getElementById('f-loc-display');
+      btn.textContent = '⏳ Mengambil lokasi...';
+      btn.disabled = true;
+
+      if (!navigator.geolocation) {
+        toast('Geolocation tidak didukung di browser ini');
+        btn.textContent = '📡 Ambil Lokasi Sekarang';
+        btn.disabled = false;
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        let address = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        try {
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+          const d = await r.json();
+          if (d.display_name) {
+            address = d.display_name.split(',').slice(0, 3).join(',').trim();
+          }
+        } catch (_) { }
+
+        S.formLocation = { lat, lng, address };
+        disp.textContent = `📍 ${address}`;
+        disp.classList.add('has-loc');
+        btn.textContent = '📡 Perbarui Lokasi';
+        btn.disabled = false;
+      }, err => {
+        toast('Gagal ambil lokasi: ' + (err.message || 'Cek izin lokasi browser'));
+        btn.textContent = '📡 Ambil Lokasi Sekarang';
+        btn.disabled = false;
+      }, { enableHighAccuracy: true, timeout: 12000 });
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // Form: open
+    // ══════════════════════════════════════════════════════════
+    async function openForm(id = null) {
+      S.editingId = id;
+      S.formPhotos = [];
+      S.formLocation = null;
+      S.formFacilities = {};
+      S.formStatus = 'dilihat';
+
+      // Reset fields
+      ['f-label', 'f-phone', 'f-price', 'f-notes'].forEach(i => document.getElementById(i).value = '');
+      document.getElementById('f-price-type').value = 'bulan';
+      const disp = document.getElementById('f-loc-display');
+      disp.textContent = '📍 Belum ada lokasi tersimpan';
+      disp.classList.remove('has-loc');
+      const locBtn = document.getElementById('btn-get-loc');
+      locBtn.textContent = '📡 Ambil Lokasi Sekarang';
+      locBtn.disabled = false;
+
+      if (id) {
+        const k = await dbGet(id);
+        if (k) {
+          document.getElementById('f-label').value = k.label || '';
+          document.getElementById('f-phone').value = k.phone || '';
+          document.getElementById('f-price').value = k.price || '';
+          document.getElementById('f-price-type').value = k.priceType || 'bulan';
+          document.getElementById('f-notes').value = k.notes || '';
+          S.formPhotos = [...(k.photos || [])];
+          S.formFacilities = { ...(k.facilities || {}) };
+          S.formStatus = k.status || 'dilihat';
+          if (k.location) {
+            S.formLocation = k.location;
+            disp.textContent = `📍 ${k.location.address || k.location.lat + ', ' + k.location.lng}`;
+            disp.classList.add('has-loc');
+            locBtn.textContent = '📡 Perbarui Lokasi';
+          }
+        }
+      }
+
+      document.getElementById('form-title').textContent = id ? 'Edit Kosan' : 'Tambah Kosan';
+      setStatus(S.formStatus);
+      renderAllFac();
+      renderPhotoGrid();
+      showScreen('form');
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Form: save
+    // ══════════════════════════════════════════════════════════
+    document.getElementById('btn-save').addEventListener('click', async () => {
+      const label = document.getElementById('f-label').value.trim();
+      if (!label) { toast('Nama kosan tidak boleh kosong'); return; }
+
+      const btn = document.getElementById('btn-save');
+      btn.textContent = 'Menyimpan...';
+      btn.disabled = true;
+
+      const now = Date.now();
+      const prev = S.editingId ? await dbGet(S.editingId) : null;
+      const kost = {
+        id: S.editingId || uid(),
+        label,
+        phone: document.getElementById('f-phone').value.trim(),
+        price: document.getElementById('f-price').value || '',
+        priceType: document.getElementById('f-price-type').value,
+        status: S.formStatus,
+        location: S.formLocation,
+        photos: S.formPhotos,
+        facilities: S.formFacilities,
+        notes: document.getElementById('f-notes').value.trim(),
+        createdAt: prev?.createdAt ?? now,
+        updatedAt: now,
+      };
+
+      await dbPut(kost);
+      toast(S.editingId ? '✅ Kosan berhasil diperbarui' : '✅ Kosan berhasil ditambahkan');
+      btn.textContent = 'Simpan Kosan';
+      btn.disabled = false;
+
+      await renderList();
+      showScreen('list');
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // List screen
+    // ══════════════════════════════════════════════════════════
+    async function renderList() {
+      let kosts = await dbAll();
+      kosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      const q = S.searchQuery.toLowerCase().trim();
+      if (q) {
+        kosts = kosts.filter(k =>
+          (k.label || '').toLowerCase().includes(q) ||
+          (k.notes || '').toLowerCase().includes(q) ||
+          (k.location?.address || '').toLowerCase().includes(q)
+        );
+      }
+
+      const container = document.getElementById('list-container');
+      document.getElementById('kost-count').textContent = kosts.length ? `${kosts.length} kosan` : '';
+
+      if (!kosts.length) {
+        container.innerHTML = `<div class="empty">
+      <div class="empty-icon">🏠</div>
+      <div class="empty-title">${q ? 'Tidak ditemukan' : 'Belum ada kosan'}</div>
+      <div class="empty-sub">${q ? 'Coba kata kunci lain' : 'Tap tombol\u00a0<strong>+</strong>\u00a0untuk mencatat kosan pertama kamu'}</div>
+    </div>`;
+        return;
+      }
+
+      container.innerHTML = '<div class="card-list">' + kosts.map(k => {
+        const meta = statusMeta(k.status);
+        const priceHtml = k.price
+          ? `${formatRp(k.price)} <small>/ ${k.priceType}</small>`
+          : `<span style="color:var(--text-3);font-weight:400;font-size:13px">Harga belum diisi</span>`;
+        const thumb = k.photos?.[0]
+          ? `<img src="${k.photos[0]}" loading="lazy" alt="">`
+          : '🏠';
+        const loc = k.location?.address
+          ? `<div class="card-loc">📍 ${esc(k.location.address)}</div>` : '';
+        const actions = [
+          k.phone ? `<button class="btn-action" data-a="call" data-v="${esc(k.phone)}">📞 Telepon</button>` : '',
+          k.phone ? `<button class="btn-action" data-a="wa"   data-v="${esc(k.phone)}">💬 WA</button>` : '',
+          k.location ? `<button class="btn-action maps" data-a="maps" data-lat="${k.location.lat}" data-lng="${k.location.lng}">🗺️ Maps</button>` : '',
+        ].filter(Boolean).join('');
+
+        return `<div class="kost-card" data-id="${k.id}">
+      <div class="card-photo">${thumb}</div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-label">${esc(k.label)}</div>
+          <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
+        </div>
+        <div class="card-price">${priceHtml}</div>
+        ${loc}
+        ${actions ? `<div class="card-actions">${actions}</div>` : ''}
+      </div>
+    </div>`;
+      }).join('') + '</div>';
+
+      container.querySelectorAll('.kost-card').forEach(card => {
+        card.addEventListener('click', e => {
+          if (e.target.closest('[data-a]')) return;
+          openDetail(card.dataset.id);
+        });
+      });
+
+      container.querySelectorAll('[data-a]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const { a, v, lat, lng } = btn.dataset;
+          if (a === 'call') window.location.href = `tel:${v}`;
+          if (a === 'wa') window.open(`https://wa.me/62${v.replace(/^0/, '')}`, '_blank');
+          if (a === 'maps') window.open(`https://maps.google.com/?q=${lat},${lng}`, '_blank');
+        });
+      });
+    }
+
+    document.getElementById('search-input').addEventListener('input', async e => {
+      S.searchQuery = e.target.value;
+      await renderList();
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // Detail screen
+    // ══════════════════════════════════════════════════════════
+    async function openDetail(id) {
+      const k = await dbGet(id);
+      if (!k) return;
+      S.viewingId = id;
+
+      document.getElementById('detail-header-label').textContent = k.label;
+      const meta = statusMeta(k.status);
+      const photos = k.photos || [];
+
+      // Gallery
+      let galleryHtml;
+      if (photos.length) {
+        const navBtns = photos.length > 1 ? `
+      <button class="gallery-nav prev" id="d-prev">‹</button>
+      <button class="gallery-nav next" id="d-next">›</button>
+      <div class="gallery-count" id="d-count">1 / ${photos.length}</div>` : '';
+        galleryHtml = `<div class="detail-gallery" id="d-gallery">
+      <img class="gallery-img" id="d-img" src="${photos[0]}" alt="">
+      ${navBtns}
+    </div>`;
+      } else {
+        galleryHtml = `<div class="detail-gallery" style="cursor:default"><div class="gallery-empty">🏠</div></div>`;
+      }
+
+      // Active facilities
+      const activeFac = ALL_FAC.filter(f => k.facilities?.[f.key]);
+      const facHtml = activeFac.length
+        ? activeFac.map(f => `<span class="fac-chip">${f.icon} ${f.label}</span>`).join('')
+        : `<span class="fac-chip none">Belum ada fasilitas dicatat</span>`;
+
+      const price = k.price ? `${formatRp(k.price)} / ${k.priceType}` : 'Harga belum diisi';
+      const dateStr = new Date(k.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const actionBtns = [
+        k.phone ? `<button class="btn-det call"  data-a="call">📞 Telepon</button>` : '',
+        k.phone ? `<button class="btn-det wa"    data-a="wa">💬 WhatsApp</button>` : '',
+        k.location ? `<button class="btn-det maps"  data-a="maps">🗺️ Buka Maps</button>` : '',
+        `<button class="btn-det edit"   data-a="edit">✏️ Edit</button>`,
+        `<button class="btn-det delete" data-a="delete">🗑️ Hapus Kosan Ini</button>`,
+      ].filter(Boolean).join('');
+
+      document.getElementById('detail-content').innerHTML = `
+    ${galleryHtml}
+    <div class="detail-body">
+      <div class="detail-label">${esc(k.label)}</div>
+      <div class="detail-top">
+        <div class="detail-price">${price}</div>
+        <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
+      </div>
+
+      ${k.phone ? `<div class="detail-row">
+        <span class="d-icon">📞</span>
+        <div><div class="d-label">Nomor Pemilik</div><div class="d-value">${esc(k.phone)}</div></div>
+      </div>` : ''}
+
+      ${k.location ? `<div class="detail-row">
+        <span class="d-icon">📍</span>
+        <div>
+          <div class="d-label">Lokasi</div>
+          <div class="d-value">${esc(k.location.address || '')}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px">${k.location.lat.toFixed(5)}, ${k.location.lng.toFixed(5)}</div>
+        </div>
+      </div>` : ''}
+
+      <div class="detail-row">
+        <span class="d-icon">📅</span>
+        <div><div class="d-label">Dicatat pada</div><div class="d-value">${dateStr}</div></div>
+      </div>
+
+      <div class="detail-section-title">Fasilitas</div>
+      <div class="fac-chips">${facHtml}</div>
+
+      ${k.notes ? `<div class="detail-section-title">Catatan</div>
+      <div class="detail-notes">${esc(k.notes)}</div>` : ''}
+
+      <div class="detail-actions">${actionBtns}</div>
+    </div>`;
+
+      // Gallery interaction
+      if (photos.length > 1) {
+        let gi = 0;
+        const gImg = document.getElementById('d-img');
+        const gCnt = document.getElementById('d-count');
+        const upd = () => { gImg.src = photos[gi]; gCnt.textContent = `${gi + 1} / ${photos.length}`; };
+        document.getElementById('d-prev').addEventListener('click', e => { e.stopPropagation(); gi = (gi - 1 + photos.length) % photos.length; upd(); });
+        document.getElementById('d-next').addEventListener('click', e => { e.stopPropagation(); gi = (gi + 1) % photos.length; upd(); });
+        document.getElementById('d-gallery').addEventListener('click', e => { if (!e.target.closest('button')) openViewer(photos, gi); });
+      } else if (photos.length === 1) {
+        document.getElementById('d-gallery').addEventListener('click', () => openViewer(photos, 0));
+      }
+
+      // Action buttons
+      document.getElementById('detail-content').querySelectorAll('[data-a]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const a = btn.dataset.a;
+          if (a === 'call') window.location.href = `tel:${k.phone}`;
+          if (a === 'wa') window.open(`https://wa.me/62${k.phone.replace(/^0/, '')}`, '_blank');
+          if (a === 'maps') window.open(`https://maps.google.com/?q=${k.location.lat},${k.location.lng}`, '_blank');
+          if (a === 'edit') openForm(id);
+          if (a === 'delete') { S.pendingDeleteId = id; document.getElementById('confirm-overlay').classList.add('open'); }
+        });
+      });
+
+      showScreen('detail');
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Photo viewer
+    // ══════════════════════════════════════════════════════════
+    function openViewer(photos, idx) {
+      S.viewerPhotos = photos;
+      S.viewerIdx = idx;
+      _updateViewer();
+      document.getElementById('photo-viewer').classList.add('open');
+    }
+
+    function _updateViewer() {
+      const { viewerPhotos: p, viewerIdx: i } = S;
+      document.getElementById('viewer-img').src = p[i];
+      document.getElementById('viewer-counter').textContent = p.length > 1 ? `${i + 1} / ${p.length}` : '';
+      document.getElementById('viewer-prev').style.display = p.length > 1 ? '' : 'none';
+      document.getElementById('viewer-next').style.display = p.length > 1 ? '' : 'none';
+    }
+
+    document.getElementById('viewer-close').addEventListener('click', () => document.getElementById('photo-viewer').classList.remove('open'));
+    document.getElementById('viewer-prev').addEventListener('click', () => { S.viewerIdx = (S.viewerIdx - 1 + S.viewerPhotos.length) % S.viewerPhotos.length; _updateViewer(); });
+    document.getElementById('viewer-next').addEventListener('click', () => { S.viewerIdx = (S.viewerIdx + 1) % S.viewerPhotos.length; _updateViewer(); });
+
+    // ══════════════════════════════════════════════════════════
+    // Delete confirm
+    // ══════════════════════════════════════════════════════════
+    document.getElementById('confirm-cancel').addEventListener('click', () => {
+      document.getElementById('confirm-overlay').classList.remove('open');
+      S.pendingDeleteId = null;
+    });
+
+    document.getElementById('confirm-delete').addEventListener('click', async () => {
+      if (!S.pendingDeleteId) return;
+      await dbDel(S.pendingDeleteId);
+      document.getElementById('confirm-overlay').classList.remove('open');
+      S.pendingDeleteId = null;
+      toast('🗑️ Kosan berhasil dihapus');
+      await renderList();
+      showScreen('list');
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // Navigation
+    // ══════════════════════════════════════════════════════════
+    document.getElementById('btn-add').addEventListener('click', () => openForm());
+
+    document.getElementById('form-back').addEventListener('click', async () => {
+      await renderList();
+      showScreen('list');
+    });
+
+    document.getElementById('detail-back').addEventListener('click', async () => {
+      await renderList();
+      showScreen('list');
+    });
+
+    document.getElementById('detail-edit-btn').addEventListener('click', () => {
+      if (S.viewingId) openForm(S.viewingId);
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // Init
+    // ══════════════════════════════════════════════════════════
+    (async () => {
+      await openDB();
+      await renderList();
+      showScreen('list');
+    })();
+  </script>
+</body>
+
+</html>

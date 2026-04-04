@@ -1,0 +1,143 @@
+================================================================
+  KOSTKU — App Pencari & Pencatat Kosan
+  Web App (MVP) → Flutter Mobile App (v2)
+================================================================
+
+MASALAH YANG DISELESAIKAN
+--------------------------
+Saat survei kosan di kota baru, data tersebar di mana-mana:
+- Foto spanduk & kamar campur aduk di galeri HP
+- Nomor telepon tercatat di berbagai tempat
+- Fasilitas & harga ditulis di notes yang berantakan
+- Susah membandingkan beberapa kosan sekaligus
+- Lupa lokasi persis kosan yang pernah dilihat
+
+Tujuan: semua data satu kosan → satu kartu, satu tempat.
+
+
+================================================================
+FITUR
+================================================================
+
+1. LIST KOSAN
+   - Tampilan kartu (card) per kosan
+   - Setiap kartu menampilkan: nama/label, harga, status, foto utama
+   - Sort by: harga termurah, terbaru ditambah, rating
+   - Filter by: status, harga range, fasilitas
+   - Search by nama / alamat / catatan
+
+2. TAMBAH / EDIT KOSAN
+   - Label bebas (contoh: "Kos Bu Sari - Jl. Mawar No. 5")
+   - Nomor telepon pemilik (tap langsung bisa telepon / WhatsApp)
+   - Harga sewa (per bulan / per tahun)
+   - Status:
+       [ ] Dilihat
+       [ ] Sudah Hubungi
+       [ ] Sudah Survey
+       [ ] Dipertimbangkan
+       [ ] Ditolak
+       [ ] Dipilih ✓
+
+3. FOTO
+   - Ambil foto langsung dari kamera (via browser / Flutter camera)
+   - Atau upload dari galeri
+   - Bisa tambah banyak foto per kosan
+   - Foto pertama jadi thumbnail kartu
+   - Tap foto untuk lihat fullscreen / swipe gallery
+
+4. LOKASI
+   - Tombol "Simpan Lokasi Sekarang" → ambil GPS otomatis
+   - Tampil koordinat + nama jalan (reverse geocoding via browser API)
+   - Tombol "Buka di Google Maps" → buka link gmaps dengan pin lokasi
+   - (Future Flutter) → simpan bookmark langsung di Google Maps via intent
+
+5. FASILITAS (Checklist)
+   Kamar:
+   [ ] AC          [ ] Kipas       [ ] Kasur
+   [ ] Lemari      [ ] Meja Belajar [ ] Jendela
+   Kamar Mandi:
+   [ ] Dalam       [ ] Luar        [ ] Water Heater
+   Umum:
+   [ ] WiFi        [ ] Listrik Token [ ] Parkir Motor
+   [ ] Parkir Mobil [ ] Dapur       [ ] Laundry
+   [ ] CCTV        [ ] Gerbang 24 Jam
+
+6. CATATAN BEBAS
+   - Text area untuk catatan apapun
+   - Contoh: "Pemiliknya ramah, nego bisa turun 100rb, bising karena deket jalan"
+
+7. PERBANDINGAN KOSAN
+   - Pilih 2–3 kosan → lihat tabel perbandingan harga & fasilitas
+   - Highlight mana yang lebih unggul
+
+8. DATA & PRIVASI
+   - Semua data tersimpan lokal (localStorage / IndexedDB)
+   - Export data ke JSON (backup manual)
+   - Import data dari JSON (restore)
+
+
+================================================================
+STATUS AWAL SETIAP KOSAN
+================================================================
+
+  Dilihat → Dihubungi → Survey → Dipertimbangkan → Dipilih / Ditolak
+
+
+================================================================
+TECH STACK
+================================================================
+
+  Web App (MVP saat ini):
+  - HTML + CSS + Vanilla JS (single file index.html)
+  - Storage  : localStorage / IndexedDB
+  - Kamera   : HTML5 MediaDevices API
+  - Lokasi   : Geolocation API (navigator.geolocation)
+  - Maps     : Google Maps link (lat,lng)
+  - Foto     : File input + base64 / ObjectURL
+
+  Flutter App (v2 rencana):
+  - image_picker (kamera & galeri)
+  - geolocator + geocoding
+  - url_launcher (buka Google Maps)
+  - hive / isar (local DB)
+  - share_plus (export data)
+
+
+================================================================
+STRUKTUR FILE (Web MVP)
+================================================================
+
+  AppKosan/
+  ├── index.html        ← main app (single file)
+  ├── requirements.txt  ← dokumen ini
+  └── (icon / assets jika diperlukan)
+
+
+================================================================
+PRIORITAS DEVELOPMENT
+================================================================
+
+  Phase 1 (MVP):
+  [x] Dokumen requirements
+  [ ] Tambah / Edit / Hapus kosan
+  [ ] Input harga, nomor, status, catatan
+  [ ] Checklist fasilitas
+  [ ] Simpan lokasi (GPS)
+  [ ] Buka di Google Maps
+  [ ] Foto dari kamera / galeri
+  [ ] List & kartu kosan
+  [ ] Data tersimpan di localStorage
+
+  Phase 2:
+  [ ] Filter & sort
+  [ ] Perbandingan kosan
+  [ ] Export / Import JSON
+  [ ] Search
+
+  Phase 3 (Flutter):
+  [ ] Port ke Flutter
+  [ ] Google Maps bookmark intent
+  [ ] Notifikasi pengingat follow-up
+
+
+================================================================
