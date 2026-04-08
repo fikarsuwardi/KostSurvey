@@ -146,7 +146,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 64px 32px;
+      padding: 48px 28px 96px;
       text-align: center;
       gap: 10px;
     }
@@ -166,6 +166,78 @@
       font-size: 13px;
       color: var(--text-3);
       line-height: 1.6;
+    }
+
+    .empty-steps {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .empty-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+
+    .empty-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .empty-step-text {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.4;
+    }
+
+    .empty-step-text strong {
+      color: var(--text);
+    }
+
+    .empty-arrow {
+      font-size: 28px;
+      animation: bounceDown 1.2s ease-in-out infinite;
+      color: var(--primary);
+      opacity: .7;
+      margin-top: 4px;
+    }
+
+    @keyframes bounceDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* FAB pulse saat list kosong */
+    .fab.pulse::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 3px solid var(--primary);
+      animation: fabPulse 1.4s ease-out infinite;
+    }
+
+    @keyframes fabPulse {
+      0% { transform: scale(1); opacity: .8; }
+      100% { transform: scale(1.7); opacity: 0; }
     }
 
     /* ── Search bar ──────────────────────────── */
@@ -1012,12 +1084,186 @@
       color: var(--text-3);
       font-size: 13px;
     }
+
+    /* ── Splash screen ───────────────────────── */
+    #splash {
+      position: absolute;
+      inset: 0;
+      background: var(--primary);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity .5s ease, transform .5s ease;
+    }
+
+    #splash.hide {
+      opacity: 0;
+      transform: scale(1.04);
+      pointer-events: none;
+    }
+
+    .splash-icon {
+      font-size: 72px;
+      line-height: 1;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.25));
+    }
+
+    .splash-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .splash-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 32px;
+    }
+
+    .splash-dots {
+      display: flex;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .splash-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      animation: dotPulse 1.2s ease-in-out infinite;
+    }
+
+    .splash-dot:nth-child(2) { animation-delay: .2s; }
+    .splash-dot:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes dotPulse {
+      0%, 100% { background: rgba(255,255,255,0.3); transform: scale(1); }
+      50% { background: rgba(255,255,255,0.9); transform: scale(1.3); }
+    }
+
+    /* ── Tipe kos picker ─────────────────────── */
+    .tipe-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .tipe-option {
+      padding: 10px 6px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      color: var(--text-2);
+      user-select: none;
+      line-height: 1.4;
+    }
+
+    .tipe-option.selected {
+      color: #fff;
+      border-color: transparent;
+      background: var(--primary);
+    }
+
+    /* ── Pros & Cons ─────────────────────────── */
+    .pc-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pc-block {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      border: 1.5px solid var(--border);
+    }
+
+    .pc-block.pro { border-color: #A5D6A7; }
+    .pc-block.con { border-color: #EF9A9A; }
+
+    .pc-header {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pc-header.pro { color: #2E7D32; }
+    .pc-header.con { color: #C62828; }
+
+    .pc-textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      resize: none;
+      outline: none;
+      min-height: 72px;
+      line-height: 1.6;
+    }
+
+    /* detail pros/cons */
+    .pc-detail-block {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 13px;
+      margin-bottom: 8px;
+      border-left: 4px solid transparent;
+    }
+
+    .pc-detail-block.pro { border-color: #4CAF50; }
+    .pc-detail-block.con { border-color: #E53935; }
+
+    .pc-detail-label {
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .pc-detail-label.pro { color: #2E7D32; }
+    .pc-detail-label.con { color: #C62828; }
+
+    .pc-detail-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 
 <body>
 
   <div id="app">
+
+    <!-- ════════════════════ SPLASH ════════════════════ -->
+    <div id="splash">
+      <div class="splash-icon">🏠</div>
+      <div class="splash-title">KostSurvey</div>
+      <div class="splash-sub">Catat semua kosan surveimu<br>dalam satu tempat yang rapi</div>
+      <div class="splash-dots">
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+      </div>
+    </div>
 
     <!-- ════════════════════ SCREEN: LIST ════════════════════ -->
     <div id="screen-list" class="screen">
@@ -1056,6 +1302,14 @@
             <div class="form-group">
               <label class="form-label">Nomor Telepon Pemilik</label>
               <input id="f-phone" class="form-input" type="tel" placeholder="cth: 08123456789">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipe Kos</label>
+              <div class="tipe-grid" id="tipe-grid">
+                <div class="tipe-option" data-val="putri">🚺 Putri</div>
+                <div class="tipe-option" data-val="putra">🚹 Putra</div>
+                <div class="tipe-option" data-val="campur">👥 Campur</div>
+              </div>
             </div>
           </div>
 
@@ -1121,6 +1375,21 @@
             <div class="section-title">Catatan</div>
             <textarea id="f-notes" class="form-textarea"
               placeholder="Catatan bebas: kesan pertama, hasil negosiasi, kondisi lingkungan..."></textarea>
+          </div>
+
+          <!-- Pros & Cons -->
+          <div class="form-section">
+            <div class="section-title">Kelebihan & Kekurangan</div>
+            <div class="pc-row">
+              <div class="pc-block pro">
+                <div class="pc-header pro">✅ Kelebihan (Pros)</div>
+                <textarea id="f-pros" class="pc-textarea" placeholder="cth: dekat kampus, kamar luas, pemilik ramah..."></textarea>
+              </div>
+              <div class="pc-block con">
+                <div class="pc-header con">❌ Kekurangan (Cons)</div>
+                <textarea id="f-cons" class="pc-textarea" placeholder="cth: bising, parkir sempit, tidak ada lift..."></textarea>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1259,7 +1528,9 @@
         { key: 'kipas', label: 'Kipas', icon: '🌀' },
         { key: 'kasur', label: 'Kasur', icon: '🛏️' },
         { key: 'lemari', label: 'Lemari', icon: '🗄️' },
-        { key: 'meja', label: 'Meja', icon: '🪑' },
+        { key: 'meja', label: 'Meja', icon: '📋' },
+        { key: 'kursi', label: 'Kursi', icon: '🪑' },
+        { key: 'wastafel', label: 'Wastafel', icon: '🚰' },
         { key: 'jendela', label: 'Jendela', icon: '🪟' },
       ],
       km: [
@@ -1291,6 +1562,7 @@
       formLocation: null,
       formFacilities: {},
       formStatus: 'dilihat',
+      formTipe: null,
       viewerPhotos: [],
       viewerIdx: 0,
       pendingDeleteId: null,
@@ -1324,6 +1596,24 @@
 
     document.getElementById('status-grid').querySelectorAll('.status-option').forEach(opt => {
       opt.addEventListener('click', () => setStatus(opt.dataset.val));
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // Tipe picker
+    // ══════════════════════════════════════════════════════════
+    function setTipe(val) {
+      S.formTipe = val;
+      document.getElementById('tipe-grid').querySelectorAll('.tipe-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.val === val);
+      });
+    }
+
+    document.getElementById('tipe-grid').querySelectorAll('.tipe-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        // toggle off if same
+        if (S.formTipe === opt.dataset.val) setTipe(null);
+        else setTipe(opt.dataset.val);
+      });
     });
 
     // ══════════════════════════════════════════════════════════
@@ -1441,9 +1731,10 @@
       S.formLocation = null;
       S.formFacilities = {};
       S.formStatus = 'dilihat';
+      S.formTipe = null;
 
       // Reset fields
-      ['f-label', 'f-phone', 'f-price', 'f-notes'].forEach(i => document.getElementById(i).value = '');
+      ['f-label', 'f-phone', 'f-price', 'f-notes', 'f-pros', 'f-cons'].forEach(i => document.getElementById(i).value = '');
       document.getElementById('f-price-type').value = 'bulan';
       const disp = document.getElementById('f-loc-display');
       disp.textContent = '📍 Belum ada lokasi tersimpan';
@@ -1460,9 +1751,12 @@
           document.getElementById('f-price').value = k.price || '';
           document.getElementById('f-price-type').value = k.priceType || 'bulan';
           document.getElementById('f-notes').value = k.notes || '';
+          document.getElementById('f-pros').value = k.pros || '';
+          document.getElementById('f-cons').value = k.cons || '';
           S.formPhotos = [...(k.photos || [])];
           S.formFacilities = { ...(k.facilities || {}) };
           S.formStatus = k.status || 'dilihat';
+          S.formTipe = k.tipe || null;
           if (k.location) {
             S.formLocation = k.location;
             disp.textContent = `📍 ${k.location.address || k.location.lat + ', ' + k.location.lng}`;
@@ -1474,6 +1768,7 @@
 
       document.getElementById('form-title').textContent = id ? 'Edit Kosan' : 'Tambah Kosan';
       setStatus(S.formStatus);
+      setTipe(S.formTipe);
       renderAllFac();
       renderPhotoGrid();
       showScreen('form');
@@ -1498,11 +1793,14 @@
         phone: document.getElementById('f-phone').value.trim(),
         price: document.getElementById('f-price').value || '',
         priceType: document.getElementById('f-price-type').value,
+        tipe: S.formTipe,
         status: S.formStatus,
         location: S.formLocation,
         photos: S.formPhotos,
         facilities: S.formFacilities,
         notes: document.getElementById('f-notes').value.trim(),
+        pros: document.getElementById('f-pros').value.trim(),
+        cons: document.getElementById('f-cons').value.trim(),
         createdAt: prev?.createdAt ?? now,
         updatedAt: now,
       };
@@ -1535,14 +1833,41 @@
       const container = document.getElementById('list-container');
       document.getElementById('kost-count').textContent = kosts.length ? `${kosts.length} kosan` : '';
 
+      const fab = document.getElementById('btn-add');
       if (!kosts.length) {
-        container.innerHTML = `<div class="empty">
-      <div class="empty-icon">🏠</div>
-      <div class="empty-title">${q ? 'Tidak ditemukan' : 'Belum ada kosan'}</div>
-      <div class="empty-sub">${q ? 'Coba kata kunci lain' : 'Tap tombol\u00a0<strong>+</strong>\u00a0untuk mencatat kosan pertama kamu'}</div>
-    </div>`;
+        if (q) {
+          fab.classList.remove('pulse');
+          container.innerHTML = `<div class="empty">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">Tidak ditemukan</div>
+            <div class="empty-sub">Coba kata kunci lain</div>
+          </div>`;
+        } else {
+          fab.classList.add('pulse');
+          container.innerHTML = `<div class="empty">
+            <div class="empty-icon">🏠</div>
+            <div class="empty-title">Belum ada kosan tercatat</div>
+            <div class="empty-sub">Mulai survei pertamamu sekarang!</div>
+            <div class="empty-steps">
+              <div class="empty-step">
+                <div class="empty-step-num">1</div>
+                <div class="empty-step-text">Tap tombol <strong>+</strong> di pojok kanan bawah</div>
+              </div>
+              <div class="empty-step">
+                <div class="empty-step-num">2</div>
+                <div class="empty-step-text">Isi nama, harga, tipe, dan fasilitas kosan</div>
+              </div>
+              <div class="empty-step">
+                <div class="empty-step-num">3</div>
+                <div class="empty-step-text">Simpan — semua tersimpan otomatis di HP kamu</div>
+              </div>
+            </div>
+            <div class="empty-arrow">↓</div>
+          </div>`;
+        }
         return;
       }
+      fab.classList.remove('pulse');
 
       container.innerHTML = '<div class="card-list">' + kosts.map(k => {
         const meta = statusMeta(k.status);
@@ -1554,6 +1879,9 @@
           : '🏠';
         const loc = k.location?.address
           ? `<div class="card-loc">📍 ${esc(k.location.address)}</div>` : '';
+        const TIPE_META = { putri: { label: '🚺 Putri', color: '#E91E63' }, putra: { label: '🚹 Putra', color: '#1565C0' }, campur: { label: '👥 Campur', color: '#6A1B9A' } };
+        const tipeBadge = k.tipe && TIPE_META[k.tipe]
+          ? `<span class="status-badge" style="background:${TIPE_META[k.tipe].color}">${TIPE_META[k.tipe].label}</span>` : '';
         const actions = [
           k.phone ? `<button class="btn-action" data-a="call" data-v="${esc(k.phone)}">📞 Telepon</button>` : '',
           k.phone ? `<button class="btn-action" data-a="wa"   data-v="${esc(k.phone)}">💬 WA</button>` : '',
@@ -1565,7 +1893,10 @@
       <div class="card-body">
         <div class="card-top">
           <div class="card-label">${esc(k.label)}</div>
-          <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
+          <div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+            ${tipeBadge}
+            <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
+          </div>
         </div>
         <div class="card-price">${priceHtml}</div>
         ${loc}
@@ -1632,6 +1963,9 @@
 
       const price = k.price ? `${formatRp(k.price)} / ${k.priceType}` : 'Harga belum diisi';
       const dateStr = new Date(k.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const TIPE_META = { putri: { label: '🚺 Putri', color: '#E91E63' }, putra: { label: '🚹 Putra', color: '#1565C0' }, campur: { label: '👥 Campur', color: '#6A1B9A' } };
+      const tipeBadgeDetail = k.tipe && TIPE_META[k.tipe]
+        ? `<span class="status-badge" style="background:${TIPE_META[k.tipe].color}">${TIPE_META[k.tipe].label}</span>` : '';
 
       const actionBtns = [
         k.phone ? `<button class="btn-det call"  data-a="call">📞 Telepon</button>` : '',
@@ -1647,7 +1981,10 @@
       <div class="detail-label">${esc(k.label)}</div>
       <div class="detail-top">
         <div class="detail-price">${price}</div>
-        <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${tipeBadgeDetail}
+          <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
+        </div>
       </div>
 
       ${k.phone ? `<div class="detail-row">
@@ -1674,6 +2011,10 @@
 
       ${k.notes ? `<div class="detail-section-title">Catatan</div>
       <div class="detail-notes">${esc(k.notes)}</div>` : ''}
+
+      ${(k.pros || k.cons) ? `<div class="detail-section-title">Kelebihan & Kekurangan</div>
+      ${k.pros ? `<div class="pc-detail-block pro"><div class="pc-detail-label pro">✅ Kelebihan</div><div class="pc-detail-text">${esc(k.pros)}</div></div>` : ''}
+      ${k.cons ? `<div class="pc-detail-block con"><div class="pc-detail-label con">❌ Kekurangan</div><div class="pc-detail-text">${esc(k.cons)}</div></div>` : ''}` : ''}
 
       <div class="detail-actions">${actionBtns}</div>
     </div>`;
@@ -1769,9 +2110,18 @@
     // Init
     // ══════════════════════════════════════════════════════════
     (async () => {
+      const splash = document.getElementById('splash');
+      const t0 = Date.now();
       await openDB();
       await renderList();
       showScreen('list');
+      // Show splash for at least 1500ms
+      const elapsed = Date.now() - t0;
+      const delay = Math.max(0, 1500 - elapsed);
+      setTimeout(() => {
+        splash.classList.add('hide');
+        setTimeout(() => splash.remove(), 520);
+      }, delay);
     })();
   </script>
 </body>
