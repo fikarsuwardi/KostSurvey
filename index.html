@@ -281,10 +281,10 @@
 
     /* ── Kost Card ───────────────────────────── */
     .card-list {
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
     .kost-card {
@@ -302,13 +302,31 @@
 
     .card-photo {
       width: 100%;
-      height: 150px;
+      height: 110px;
       background: #E8ECF0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 48px;
+      font-size: 40px;
       color: var(--text-3);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-photo-note {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.58);
+      color: #fff;
+      font-size: 10px;
+      line-height: 1.35;
+      padding: 4px 7px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
@@ -331,10 +349,13 @@
     }
 
     .card-label {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 600;
       flex: 1;
       line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .status-badge {
@@ -1246,6 +1267,77 @@
       color: var(--text);
       white-space: pre-wrap;
     }
+
+    /* ── Filter bar ──────────────────────────── */
+    .filter-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      padding: 5px 0;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      padding: 3px 10px;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .filter-row::-webkit-scrollbar { display: none; }
+
+    .filter-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      flex-shrink: 0;
+    }
+
+    .filter-chip {
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text-2);
+      border: 1.5px solid var(--border);
+      user-select: none;
+      flex-shrink: 0;
+      transition: all .12s;
+    }
+
+    .filter-chip.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* ── Compact card adjustments ────────────── */
+    .card-body {
+      padding: 10px 10px 8px;
+    }
+
+    .card-price {
+      font-size: 13px;
+    }
+
+    .card-loc {
+      font-size: 11px;
+    }
+
+    /* ── Location manual input ───────────────── */
+    .loc-divider {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-3);
+      margin: 8px 0 6px;
+    }
   </style>
 </head>
 
@@ -1275,6 +1367,27 @@
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
           <input id="search-input" class="search-input" type="text" placeholder="Cari nama, alamat, catatan...">
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-row">
+          <span class="filter-label">Urut:</span>
+          <div class="filter-chip active" data-sort="newest">Terbaru</div>
+          <div class="filter-chip" data-sort="oldest">Terlama</div>
+          <div class="filter-chip" data-sort="price_asc">Harga ↑</div>
+          <div class="filter-chip" data-sort="price_desc">Harga ↓</div>
+          <div class="filter-chip" data-sort="name">A–Z</div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">Status:</span>
+          <div class="filter-chip active" data-fstatus="all">Semua</div>
+          <div class="filter-chip" data-fstatus="dilihat">Dilihat</div>
+          <div class="filter-chip" data-fstatus="dihubungi">Dihubungi</div>
+          <div class="filter-chip" data-fstatus="survey">Survey</div>
+          <div class="filter-chip" data-fstatus="dipertimbangkan">Pertimbangan</div>
+          <div class="filter-chip" data-fstatus="dipilih">Dipilih</div>
+          <div class="filter-chip" data-fstatus="ditolak">Ditolak</div>
+          <div class="filter-chip" data-fstatus="no_response">No Response</div>
         </div>
       </div>
       <div class="scroll-content" id="list-container">
@@ -1335,6 +1448,7 @@
                 <div class="status-option" data-val="dipertimbangkan">🤔 Dipertimbangkan</div>
                 <div class="status-option" data-val="dipilih">✅ Dipilih</div>
                 <div class="status-option" data-val="ditolak">❌ Ditolak</div>
+                <div class="status-option" data-val="no_response" style="grid-column:1/-1">📵 No Response</div>
               </div>
             </div>
           </div>
@@ -1343,7 +1457,10 @@
           <div class="form-section">
             <div class="section-title">Lokasi</div>
             <div id="f-loc-display" class="loc-display">📍 Belum ada lokasi tersimpan</div>
-            <button class="btn-loc" id="btn-get-loc">📡 Ambil Lokasi Sekarang</button>
+            <button class="btn-loc" id="btn-get-loc">📡 Ambil Lokasi GPS</button>
+            <div class="loc-divider">— atau isi manual —</div>
+            <input id="f-loc-manual" class="form-input" type="text"
+              placeholder="Alamat atau link Google Maps (https://maps.app.goo.gl/...)">
           </div>
 
           <!-- Foto -->
@@ -1482,6 +1599,7 @@
       dipertimbangkan: { label: 'Dipertimbangkan', color: '#7B1FA2' },
       dipilih: { label: 'Dipilih ✓', color: '#388E3C' },
       ditolak: { label: 'Ditolak', color: '#C62828' },
+      no_response: { label: 'No Response', color: '#9E9E9E' },
     };
     const statusMeta = s => STATUS[s] || STATUS.dilihat;
 
@@ -1567,18 +1685,20 @@
       viewerIdx: 0,
       pendingDeleteId: null,
       searchQuery: '',
+      sortBy: 'newest',
+      filterStatus: 'all',
     };
 
     // ══════════════════════════════════════════════════════════
     // Router
     // ══════════════════════════════════════════════════════════
-    function showScreen(name) {
+    function showScreen(name, pushHistory = true) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById('screen-' + name).classList.add('active');
       S.screen = name;
-      // scroll to top
       const sc = document.querySelector('#screen-' + name + ' .scroll-content');
       if (sc) sc.scrollTop = 0;
+      if (pushHistory && name !== 'list') history.pushState({ screen: name }, '');
     }
 
     // ══════════════════════════════════════════════════════════
@@ -1710,9 +1830,10 @@
           }
         } catch (_) { }
 
-        S.formLocation = { lat, lng, address };
+        S.formLocation = { lat, lng, address, mapsUrl: null };
         disp.textContent = `📍 ${address}`;
         disp.classList.add('has-loc');
+        document.getElementById('f-loc-manual').value = address;
         btn.textContent = '📡 Perbarui Lokasi';
         btn.disabled = false;
       }, err => {
@@ -1720,6 +1841,28 @@
         btn.textContent = '📡 Ambil Lokasi Sekarang';
         btn.disabled = false;
       }, { enableHighAccuracy: true, timeout: 12000 });
+    });
+
+    document.getElementById('f-loc-manual').addEventListener('input', e => {
+      const val = e.target.value.trim();
+      const disp = document.getElementById('f-loc-display');
+      if (!val) {
+        if (!S.formLocation?.lat) {
+          S.formLocation = null;
+          disp.textContent = '📍 Belum ada lokasi tersimpan';
+          disp.classList.remove('has-loc');
+        }
+        return;
+      }
+      const isMapsUrl = /maps\.app\.goo\.gl|maps\.google\.com|goo\.gl\/maps/.test(val);
+      S.formLocation = {
+        lat: S.formLocation?.lat || null,
+        lng: S.formLocation?.lng || null,
+        address: val,
+        mapsUrl: isMapsUrl ? val : null,
+      };
+      disp.textContent = `📍 ${val}`;
+      disp.classList.add('has-loc');
     });
 
     // ══════════════════════════════════════════════════════════
@@ -1734,13 +1877,13 @@
       S.formTipe = null;
 
       // Reset fields
-      ['f-label', 'f-phone', 'f-price', 'f-notes', 'f-pros', 'f-cons'].forEach(i => document.getElementById(i).value = '');
+      ['f-label', 'f-phone', 'f-price', 'f-notes', 'f-pros', 'f-cons', 'f-loc-manual'].forEach(i => document.getElementById(i).value = '');
       document.getElementById('f-price-type').value = 'bulan';
       const disp = document.getElementById('f-loc-display');
       disp.textContent = '📍 Belum ada lokasi tersimpan';
       disp.classList.remove('has-loc');
       const locBtn = document.getElementById('btn-get-loc');
-      locBtn.textContent = '📡 Ambil Lokasi Sekarang';
+      locBtn.textContent = '📡 Ambil Lokasi GPS';
       locBtn.disabled = false;
 
       if (id) {
@@ -1759,9 +1902,11 @@
           S.formTipe = k.tipe || null;
           if (k.location) {
             S.formLocation = k.location;
-            disp.textContent = `📍 ${k.location.address || k.location.lat + ', ' + k.location.lng}`;
+            const locText = k.location.mapsUrl || k.location.address || (k.location.lat ? `${k.location.lat.toFixed(5)}, ${k.location.lng.toFixed(5)}` : '');
+            disp.textContent = `📍 ${locText}`;
             disp.classList.add('has-loc');
-            locBtn.textContent = '📡 Perbarui Lokasi';
+            document.getElementById('f-loc-manual').value = locText;
+            locBtn.textContent = '📡 Perbarui Lokasi GPS';
           }
         }
       }
@@ -1819,8 +1964,18 @@
     // ══════════════════════════════════════════════════════════
     async function renderList() {
       let kosts = await dbAll();
-      kosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
+      // Sort
+      if (S.sortBy === 'newest') kosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      else if (S.sortBy === 'oldest') kosts.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      else if (S.sortBy === 'price_asc') kosts.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+      else if (S.sortBy === 'price_desc') kosts.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+      else if (S.sortBy === 'name') kosts.sort((a, b) => (a.label || '').localeCompare(b.label || '', 'id'));
+
+      // Filter by status
+      if (S.filterStatus !== 'all') kosts = kosts.filter(k => k.status === S.filterStatus);
+
+      // Search
       const q = S.searchQuery.toLowerCase().trim();
       if (q) {
         kosts = kosts.filter(k =>
@@ -1835,12 +1990,12 @@
 
       const fab = document.getElementById('btn-add');
       if (!kosts.length) {
-        if (q) {
+        if (q || S.filterStatus !== 'all') {
           fab.classList.remove('pulse');
           container.innerHTML = `<div class="empty">
             <div class="empty-icon">🔍</div>
             <div class="empty-title">Tidak ditemukan</div>
-            <div class="empty-sub">Coba kata kunci lain</div>
+            <div class="empty-sub">Coba ubah filter atau kata kunci</div>
           </div>`;
         } else {
           fab.classList.add('pulse');
@@ -1869,63 +2024,63 @@
       }
       fab.classList.remove('pulse');
 
+      const TIPE_META = { putri: { label: '🚺 Putri', color: '#E91E63' }, putra: { label: '🚹 Putra', color: '#1565C0' }, campur: { label: '👥 Campur', color: '#6A1B9A' } };
+
       container.innerHTML = '<div class="card-list">' + kosts.map(k => {
         const meta = statusMeta(k.status);
         const priceHtml = k.price
           ? `${formatRp(k.price)} <small>/ ${k.priceType}</small>`
-          : `<span style="color:var(--text-3);font-weight:400;font-size:13px">Harga belum diisi</span>`;
+          : `<span style="color:var(--text-3);font-weight:400;font-size:12px">Harga belum diisi</span>`;
         const thumb = k.photos?.[0]
           ? `<img src="${k.photos[0]}" loading="lazy" alt="">`
           : '🏠';
-        const loc = k.location?.address
-          ? `<div class="card-loc">📍 ${esc(k.location.address)}</div>` : '';
-        const TIPE_META = { putri: { label: '🚺 Putri', color: '#E91E63' }, putra: { label: '🚹 Putra', color: '#1565C0' }, campur: { label: '👥 Campur', color: '#6A1B9A' } };
+        const noteOverlay = k.notes
+          ? `<div class="card-photo-note">${esc(k.notes.slice(0, 90))}${k.notes.length > 90 ? '…' : ''}</div>` : '';
+        const addrRaw = k.location?.address || '';
+        const addrShort = addrRaw.length > 45 ? addrRaw.slice(0, 45) + '…' : addrRaw;
+        const loc = addrRaw ? `<div class="card-loc">📍 ${esc(addrShort)}</div>` : '';
         const tipeBadge = k.tipe && TIPE_META[k.tipe]
-          ? `<span class="status-badge" style="background:${TIPE_META[k.tipe].color}">${TIPE_META[k.tipe].label}</span>` : '';
-        const actions = [
-          k.phone ? `<button class="btn-action" data-a="call" data-v="${esc(k.phone)}">📞 Telepon</button>` : '',
-          k.phone ? `<button class="btn-action" data-a="wa"   data-v="${esc(k.phone)}">💬 WA</button>` : '',
-          k.location ? `<button class="btn-action maps" data-a="maps" data-lat="${k.location.lat}" data-lng="${k.location.lng}">🗺️ Maps</button>` : '',
-        ].filter(Boolean).join('');
+          ? `<span class="status-badge" style="background:${TIPE_META[k.tipe].color};font-size:9px">${TIPE_META[k.tipe].label}</span>` : '';
 
         return `<div class="kost-card" data-id="${k.id}">
-      <div class="card-photo">${thumb}</div>
+      <div class="card-photo">${thumb}${noteOverlay}</div>
       <div class="card-body">
-        <div class="card-top">
-          <div class="card-label">${esc(k.label)}</div>
-          <div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
-            ${tipeBadge}
-            <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
-          </div>
+        <div class="card-label">${esc(k.label)}</div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap;margin:3px 0 4px">
+          ${tipeBadge}
+          <span class="status-badge" style="background:${meta.color}">${meta.label}</span>
         </div>
         <div class="card-price">${priceHtml}</div>
         ${loc}
-        ${actions ? `<div class="card-actions">${actions}</div>` : ''}
       </div>
     </div>`;
       }).join('') + '</div>';
 
       container.querySelectorAll('.kost-card').forEach(card => {
-        card.addEventListener('click', e => {
-          if (e.target.closest('[data-a]')) return;
-          openDetail(card.dataset.id);
-        });
-      });
-
-      container.querySelectorAll('[data-a]').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          const { a, v, lat, lng } = btn.dataset;
-          if (a === 'call') window.location.href = `tel:${v}`;
-          if (a === 'wa') window.open(`https://wa.me/62${v.replace(/^0/, '')}`, '_blank');
-          if (a === 'maps') window.open(`https://maps.google.com/?q=${lat},${lng}`, '_blank');
-        });
+        card.addEventListener('click', () => openDetail(card.dataset.id));
       });
     }
 
     document.getElementById('search-input').addEventListener('input', async e => {
       S.searchQuery = e.target.value;
       await renderList();
+    });
+
+    // ── Filter / Sort chips ───────────────────
+    document.querySelectorAll('[data-sort]').forEach(chip => {
+      chip.addEventListener('click', async () => {
+        S.sortBy = chip.dataset.sort;
+        document.querySelectorAll('[data-sort]').forEach(c => c.classList.toggle('active', c === chip));
+        await renderList();
+      });
+    });
+
+    document.querySelectorAll('[data-fstatus]').forEach(chip => {
+      chip.addEventListener('click', async () => {
+        S.filterStatus = chip.dataset.fstatus;
+        document.querySelectorAll('[data-fstatus]').forEach(c => c.classList.toggle('active', c === chip));
+        await renderList();
+      });
     });
 
     // ══════════════════════════════════════════════════════════
@@ -2038,7 +2193,15 @@
           const a = btn.dataset.a;
           if (a === 'call') window.location.href = `tel:${k.phone}`;
           if (a === 'wa') window.open(`https://wa.me/62${k.phone.replace(/^0/, '')}`, '_blank');
-          if (a === 'maps') window.open(`https://maps.google.com/?q=${k.location.lat},${k.location.lng}`, '_blank');
+          if (a === 'maps') {
+            const loc = k.location;
+            const mapsTarget = loc.mapsUrl
+              ? loc.mapsUrl
+              : (loc.lat && loc.lng)
+                ? `https://maps.google.com/?q=${loc.lat},${loc.lng}`
+                : `https://maps.google.com/?q=${encodeURIComponent(loc.address)}`;
+            window.open(mapsTarget, '_blank');
+          }
           if (a === 'edit') openForm(id);
           if (a === 'delete') { S.pendingDeleteId = id; document.getElementById('confirm-overlay').classList.add('open'); }
         });
@@ -2107,6 +2270,38 @@
     });
 
     // ══════════════════════════════════════════════════════════
+    // Device back-button (popstate)
+    // ══════════════════════════════════════════════════════════
+    window.addEventListener('popstate', async () => {
+      // Close overlays first
+      const viewer = document.getElementById('photo-viewer');
+      if (viewer.classList.contains('open')) {
+        viewer.classList.remove('open');
+        history.pushState({ screen: S.screen }, '');
+        return;
+      }
+      const confirmOverlay = document.getElementById('confirm-overlay');
+      if (confirmOverlay.classList.contains('open')) {
+        confirmOverlay.classList.remove('open');
+        S.pendingDeleteId = null;
+        history.pushState({ screen: S.screen }, '');
+        return;
+      }
+
+      if (S.screen !== 'list') {
+        await renderList();
+        // Navigate to list without pushing another state (popstate already popped one)
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-list').classList.add('active');
+        S.screen = 'list';
+        const sc = document.querySelector('#screen-list .scroll-content');
+        if (sc) sc.scrollTop = 0;
+      }
+      // Always push a list state so there is always something to pop next time
+      history.pushState({ screen: 'list' }, '');
+    });
+
+    // ══════════════════════════════════════════════════════════
     // Init
     // ══════════════════════════════════════════════════════════
     (async () => {
@@ -2114,7 +2309,10 @@
       const t0 = Date.now();
       await openDB();
       await renderList();
-      showScreen('list');
+      showScreen('list', false);
+      // Seed history so back button never exits the app
+      history.replaceState({ screen: 'list' }, '');
+      history.pushState({ screen: 'list' }, '');
       // Show splash for at least 1500ms
       const elapsed = Date.now() - t0;
       const delay = Math.max(0, 1500 - elapsed);
