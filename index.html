@@ -2155,7 +2155,7 @@
         <div>
           <div class="d-label">Lokasi</div>
           <div class="d-value">${esc(k.location.address || '')}</div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:2px">${k.location.lat.toFixed(5)}, ${k.location.lng.toFixed(5)}</div>
+          ${(k.location.lat != null && k.location.lng != null) ? `<div style="font-size:11px;color:var(--text-3);margin-top:2px">${k.location.lat.toFixed(5)}, ${k.location.lng.toFixed(5)}</div>` : ''}
         </div>
       </div>` : ''}
 
