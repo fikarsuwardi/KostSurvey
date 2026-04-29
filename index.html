@@ -1388,6 +1388,7 @@
           <div class="filter-chip" data-fstatus="dipilih">Dipilih</div>
           <div class="filter-chip" data-fstatus="ditolak">Ditolak</div>
           <div class="filter-chip" data-fstatus="no_response">No Response</div>
+          <div class="filter-chip" data-fstatus="penuh">Penuh</div>
         </div>
       </div>
       <div class="scroll-content" id="list-container">
@@ -1448,7 +1449,8 @@
                 <div class="status-option" data-val="dipertimbangkan">🤔 Dipertimbangkan</div>
                 <div class="status-option" data-val="dipilih">✅ Dipilih</div>
                 <div class="status-option" data-val="ditolak">❌ Ditolak</div>
-                <div class="status-option" data-val="no_response" style="grid-column:1/-1">📵 No Response</div>
+                <div class="status-option" data-val="no_response">📵 No Response</div>
+                <div class="status-option" data-val="penuh">🔒 Penuh</div>
               </div>
             </div>
           </div>
@@ -1600,6 +1602,7 @@
       dipilih: { label: 'Dipilih ✓', color: '#388E3C' },
       ditolak: { label: 'Ditolak', color: '#C62828' },
       no_response: { label: 'No Response', color: '#9E9E9E' },
+      penuh: { label: 'Penuh', color: '#E64A19' },
     };
     const statusMeta = s => STATUS[s] || STATUS.dilihat;
 
@@ -2308,18 +2311,25 @@
       const splash = document.getElementById('splash');
       const t0 = Date.now();
       await openDB();
+      const existing = await dbAll();
       await renderList();
       showScreen('list', false);
       // Seed history so back button never exits the app
       history.replaceState({ screen: 'list' }, '');
       history.pushState({ screen: 'list' }, '');
-      // Show splash for at least 1500ms
-      const elapsed = Date.now() - t0;
-      const delay = Math.max(0, 1500 - elapsed);
-      setTimeout(() => {
+      if (existing.length > 0) {
+        // Ada kost tersimpan — skip splash
         splash.classList.add('hide');
         setTimeout(() => splash.remove(), 520);
-      }, delay);
+      } else {
+        // Pertama kali — tampilkan splash minimal 1500ms
+        const elapsed = Date.now() - t0;
+        const delay = Math.max(0, 1500 - elapsed);
+        setTimeout(() => {
+          splash.classList.add('hide');
+          setTimeout(() => splash.remove(), 520);
+        }, delay);
+      }
     })();
   </script>
 </body>
